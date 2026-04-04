@@ -15,13 +15,15 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.*;
 
-public class ShoppingCart {
+public class ShoppingCart implements AggregateRoot<ShoppingCartId> {
     private ShoppingCartId id;
     private CustomerId customerId;
     private Money totalAmount;
     private Quantity totalItems;
     private OffsetDateTime createdAt;
     private Set<ShoppingCartItem> items;
+
+    private Long version;
 
     @Builder(builderClassName = "ExistingShoppingCartBuilder", builderMethodName = "existing")
     public ShoppingCart(ShoppingCartId id, CustomerId customerId,
@@ -133,6 +135,10 @@ public class ShoppingCart {
         return createdAt;
     }
 
+    public Long version() {
+        return version;
+    }
+
     private void updateItem(ShoppingCartItem shoppingCartItem, Product product, Quantity quantity) {
         shoppingCartItem.refresh(product);
         shoppingCartItem.changeQuantity(shoppingCartItem.quantity().add(quantity));
@@ -190,6 +196,10 @@ public class ShoppingCart {
     private void setItems(Set<ShoppingCartItem> items) {
         Objects.requireNonNull(items);
         this.items = items;
+    }
+
+    private void setVersion(Long version) {
+        this.version = version;
     }
 
     @Override

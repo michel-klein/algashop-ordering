@@ -11,7 +11,7 @@ import java.util.UUID;
 
 import static com.algaworks.algashop.ordering.domain.model.exception.ErrorMessages.*;
 
-public class Customer {
+public class Customer implements AggregateRoot<CustomerId> {
     private CustomerId id;
     private FullName fullName;
     private BirthDate birthDate;
@@ -25,6 +25,8 @@ public class Customer {
     private LoyaltyPoints loyaltyPoints;
     private Address address;
 
+    private Long version;
+
     @Builder(builderClassName = "NewCustomerBuilder", builderMethodName = "newCustomer")
     private static Customer createNew(
             FullName fullName,
@@ -36,6 +38,7 @@ public class Customer {
             Address address) {
         return new Customer(
                 new CustomerId(),
+                null,
                 fullName,
                 birthDate,
                 email,
@@ -50,10 +53,11 @@ public class Customer {
     }
 
     @Builder(builderClassName = "ExistingCustomerBuilder", builderMethodName = "existingCustomer")
-    private Customer(CustomerId id, FullName fullName, BirthDate birthDate, Email email, Phone phone,
+    private Customer(CustomerId id, Long version, FullName fullName, BirthDate birthDate, Email email, Phone phone,
                     Document document, Boolean promotionNotificationsAllowed, Boolean archived,
                     OffsetDateTime registeredAt, OffsetDateTime archivedAt, LoyaltyPoints loyaltyPoints, Address address) {
         this.setId(id);
+        this.setVersion(version);
         this.setFullName(fullName);
         this.setBirthDate(birthDate);
         this.setEmail(email);
@@ -165,6 +169,10 @@ public class Customer {
         return address;
     }
 
+    public Long version() {
+        return version;
+    }
+
     private void setId(CustomerId id) {
         Objects.requireNonNull(id);
         this.id = id;
@@ -226,6 +234,10 @@ public class Customer {
     private void setAddress(Address address) {
         Objects.requireNonNull(loyaltyPoints);
         this.address = address;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     private void verifyIfChangeable() {
