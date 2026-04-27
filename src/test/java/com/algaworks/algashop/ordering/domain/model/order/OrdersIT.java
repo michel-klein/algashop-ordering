@@ -159,7 +159,7 @@ class OrdersIT {
 
         List<Order> listedOrders = orders.placedByCustomerInYear(customerId, Year.now());
         Assertions.assertThat(listedOrders).isNotEmpty();
-        Assertions.assertThat(listedOrders.size()).isEqualTo(2);
+        Assertions.assertThat(listedOrders).hasSize(2);
 
         listedOrders = orders.placedByCustomerInYear(customerId, Year.now().minusYears(1));
         Assertions.assertThat(listedOrders).isEmpty();

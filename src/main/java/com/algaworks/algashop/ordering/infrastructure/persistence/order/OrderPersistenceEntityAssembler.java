@@ -47,6 +47,8 @@ public class OrderPersistenceEntityAssembler {
         CustomerPersistenceEntity customerPersistenceEntity = customerRepository.getReferenceById(order.customerId().value());
         orderPersistenceEntity.setCustomer(customerPersistenceEntity);
 
+        orderPersistenceEntity.addEvents(order.domainEvents());
+
         return orderPersistenceEntity;
     }
 
@@ -60,7 +62,7 @@ public class OrderPersistenceEntityAssembler {
         Set<OrderItemPersistenceEntity> existingItems = orderPersistenceEntity.getItems();
         if (existingItems == null || existingItems.isEmpty()) {
             return newOrUpdatedItems.stream()
-                    .map(orderItem -> fromDomain(orderItem))
+                    .map(this::fromDomain)
                     .collect(Collectors.toSet());
         }
 

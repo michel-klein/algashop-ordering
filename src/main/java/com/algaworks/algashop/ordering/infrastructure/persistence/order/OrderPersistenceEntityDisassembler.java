@@ -37,7 +37,7 @@ public class OrderPersistenceEntityDisassembler {
     }
 
     private Set<OrderItem> toDomainEntity(Set<OrderItemPersistenceEntity> items) {
-        return items.stream().map(i -> toDomainEntity(i)).collect(Collectors.toSet());
+        return items.stream().map(this::toDomainEntity).collect(Collectors.toSet());
     }
 
     private OrderItem toDomainEntity(OrderItemPersistenceEntity persistenceEntity) {

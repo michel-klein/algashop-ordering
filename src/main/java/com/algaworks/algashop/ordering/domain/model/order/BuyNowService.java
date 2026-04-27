@@ -19,9 +19,9 @@ public class BuyNowService {
 
         Order order = Order.draft(customerId);
         order.changeBilling(billing);
-        order.changeShipping(shipping);
         order.changePaymentMethod(paymentMethod);
         order.addItem(product, quantity);
+        order.changeShipping(shipping);
         order.place();
 
         return order;

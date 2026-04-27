@@ -29,7 +29,7 @@ class OrderMarkAsReadyTest {
         Assertions.assertThat(order.readyAt()).isNull();
 
         Assertions.assertThatExceptionOfType(OrderStatusCannotBeChangedException.class)
-                .isThrownBy(() -> order.markAsReady());
+                .isThrownBy(order::markAsReady);
 
         Assertions.assertThat(order.status()).isEqualTo(OrderStatus.DRAFT);
         Assertions.assertThat(order.readyAt()).isNull();

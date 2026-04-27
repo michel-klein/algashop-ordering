@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomerRegistrationService {
 
-    private Customers customers;
+    private final Customers customers;
 
     public Customer register(
             FullName fullName, BirthDate birthDate, Email email,
