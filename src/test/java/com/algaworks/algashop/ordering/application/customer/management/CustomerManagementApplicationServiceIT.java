@@ -1,6 +1,5 @@
-package com.algaworks.algashop.ordering.application.service.customer.management;
+package com.algaworks.algashop.ordering.application.customer.management;
 
-import com.algaworks.algashop.ordering.application.customer.management.*;
 import com.algaworks.algashop.ordering.application.customer.notification.CustomerNotificationApplicationService;
 import com.algaworks.algashop.ordering.application.customer.query.CustomerOutput;
 import com.algaworks.algashop.ordering.application.customer.query.CustomerQueryService;
@@ -9,13 +8,13 @@ import com.algaworks.algashop.ordering.domain.model.customer.CustomerArchivedExc
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerNotFoundException;
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerRegisteredEvent;
 import com.algaworks.algashop.ordering.infrastructure.listener.CustomerEventListener;
-import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -34,7 +33,7 @@ class CustomerManagementApplicationServiceIT {
     private CustomerNotificationApplicationService customerNotificationApplicationService;
 
     @Autowired
-    private CustomerQueryService customerQueryService;
+    private CustomerQueryService queryService;
 
     @Test
     public void shouldRegister() {
@@ -43,28 +42,33 @@ class CustomerManagementApplicationServiceIT {
         UUID customerId = customerManagementApplicationService.create(input);
         Assertions.assertThat(customerId).isNotNull();
 
-        CustomerOutput customerOutput = customerQueryService.findById(customerId);
+        CustomerOutput customerOutput = queryService.findById(customerId);
 
         Assertions.assertThat(customerOutput)
-                        .extracting(
-                                CustomerOutput::getId,
-                                CustomerOutput::getFirstName,
-                                CustomerOutput::getLastName,
-                                CustomerOutput::getEmail,
-                                CustomerOutput::getBirthDate
-                        ).containsExactly(
-                                customerId,
-                                "John",
-                                "Doe",
-                                "johndoe@email.com",
-                                LocalDate.of(1991, 7,5)
+                .extracting(
+                        CustomerOutput::getId,
+                        CustomerOutput::getFirstName,
+                        CustomerOutput::getLastName,
+                        CustomerOutput::getEmail,
+                        CustomerOutput::getBirthDate
+                ).containsExactly(
+                        customerId,
+                        "John",
+                        "Doe",
+                        "johndoe@email.com",
+                        LocalDate.of(1991, 7,5)
                 );
 
         Assertions.assertThat(customerOutput.getRegisteredAt()).isNotNull();
 
-        Mockito.verify(customerEventListener).listen(Mockito.any(CustomerRegisteredEvent.class));
-        Mockito.verify(customerEventListener, Mockito.never()).listen(Mockito.any(CustomerArchivedEvent.class));
-        Mockito.verify(customerNotificationApplicationService).notifyNewRegistration(Mockito.any(CustomerNotificationApplicationService.NotifyNewRegistrationInput.class));
+        Mockito.verify(customerEventListener)
+                .listen(Mockito.any(CustomerRegisteredEvent.class));
+
+        Mockito.verify(customerEventListener, Mockito.never())
+                .listen(Mockito.any(CustomerArchivedEvent.class));
+
+        Mockito.verify(customerNotificationApplicationService)
+                .notifyNewRegistration(Mockito.any(CustomerNotificationApplicationService.NotifyNewRegistrationInput.class));
     }
 
     @Test
@@ -77,7 +81,7 @@ class CustomerManagementApplicationServiceIT {
 
         customerManagementApplicationService.update(customerId, updateInput);
 
-        CustomerOutput customerOutput = customerQueryService.findById(customerId);
+        CustomerOutput customerOutput = queryService.findById(customerId);
 
         Assertions.assertThat(customerOutput)
                 .extracting(
@@ -105,7 +109,7 @@ class CustomerManagementApplicationServiceIT {
 
         customerManagementApplicationService.archive(customerId);
 
-        CustomerOutput archivedCustomer = customerQueryService.findById(customerId);
+        CustomerOutput archivedCustomer = queryService.findById(customerId);
 
         Assertions.assertThat(archivedCustomer)
                 .isNotNull()

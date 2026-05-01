@@ -18,8 +18,6 @@ public class CustomerManagementApplicationService {
     private final CustomerRegistrationService customerRegistration;
     private final Customers customers;
 
-    private final Mapper mapper;
-
     @Transactional
     public UUID create(CustomerInput input) {
         Objects.requireNonNull(input);
@@ -46,37 +44,6 @@ public class CustomerManagementApplicationService {
         customers.add(customer);
 
         return customer.id().value();
-    }
-
-    @Transactional(readOnly = true)
-    public CustomerOutput findById(UUID customerId) {
-        Objects.requireNonNull(customerId);
-        Customer customer = customers.ofId(new CustomerId(customerId))
-                .orElseThrow(CustomerNotFoundException::new);
-//        return CustomerOutput.builder()
-//                .id(customer.id().value())
-//                .firstName(customer.fullName().firstName())
-//                .lastName(customer.fullName().lastName())
-//                .email(customer.email().value())
-//                .document(customer.document().value())
-//                .phone(customer.phone().value())
-//                .promotionNotificationsAllowed(customer.isPromotionNotificationsAllowed())
-//                .loyaltyPoints(customer.loyaltyPoints().value())
-//                .registeredAt(customer.registeredAt())
-//                .archived(customer.isArchived())
-//                .archivedAt(customer.archivedAt() != null ? customer.archivedAt() : null)
-//                .birthDate(customer.birthDate() != null ? customer.birthDate().value() : null)
-//                .address(AddressData.builder()
-//                        .street(customer.address().street())
-//                        .number(customer.address().number())
-//                        .complement(customer.address().complement())
-//                        .neighborhood(customer.address().neighborhood())
-//                        .city(customer.address().city())
-//                        .state(customer.address().state())
-//                        .zipCode(customer.address().zipCode().value())
-//                        .build())
-//                .build();
-        return mapper.convert(customer, CustomerOutput.class);
     }
 
     @Transactional
